@@ -1,0 +1,6 @@
+[package]
+name = "vec_so_nice_you_make_it_twice"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
