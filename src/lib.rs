@@ -30,6 +30,11 @@ macro_rules! cement {
             cement!(ඞBODY: $ty, $collection, $len)
         };
     };
+    ($vis:vis static $name:ident: &[$ty:ty] = $collection:expr) => {
+        $vis static $name: &'static [$ty; cement!(ඞLEN: $collection)] = &{
+            cement!(ඞBODY: $ty, $collection, cement!(ඞLEN: $collection))
+        };
+    };
     (ඞLEN: $collection:expr) => {
         {
             let collection = $collection;
@@ -77,11 +82,14 @@ mod tests {
         cement!(pub(in self) const ARRAY3: [i32; 3] = v_1_2_3());
         cement!(pub(in super) static ARRAY4: [i32; 3] = v_1_2_3());
 
+        cement!(static ARRAY5: &[i32] = v_1_2_3());
+
         let _ = ARRAY1;
 
         dbg!(ARRAY1);
         dbg!(ARRAY2);
         dbg!(ARRAY3);
         dbg!(ARRAY4);
+        dbg!(ARRAY5);
     }
 }
