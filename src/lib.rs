@@ -11,31 +11,31 @@ extern crate std;
 #[macro_export]
 macro_rules! cement {
     ($vis:vis const $name:ident: [$ty:ty; ?] = $collection:expr) => {
-        $vis const $name: [$ty; cement!(ඞLEN: $collection)] = {
-            cement!(ඞBODY: $ty, $collection, cement!(ඞLEN: $collection))
+        $vis const $name: [$ty; cement!(ඞLEN: collection=$collection)] = {
+            cement!(ඞBODY: ty = $ty, collection = $collection, len = cement!(ඞLEN: collection = $collection))
         };
     };
     ($vis:vis static $name:ident: [$ty:ty; ?] = $collection:expr) => {
-        $vis static $name: [$ty; cement!(ඞLEN: $collection)] = {
-            cement!(ඞBODY: $ty, $collection, cement!(ඞLEN: $collection))
+        $vis static $name: [$ty; cement!(ඞLEN: collection = $collection)] = {
+            cement!(ඞBODY: ty = $ty, collection = $collection, len = cement!(ඞLEN: collection = $collection))
         };
     };
     ($vis:vis const $name:ident: [$ty:ty; $len:expr] = $collection:expr) => {
         $vis const $name: [$ty; $len] = {
-            cement!(ඞBODY: $ty, $collection, $len)
+            cement!(ඞBODY: ty = $ty, collection = $collection, len = $len)
         };
     };
     ($vis:vis static $name:ident: [$ty:ty; $len:expr] = $collection:expr) => {
         $vis static $name: [$ty; $len] = {
-            cement!(ඞBODY: $ty, $collection, $len)
+            cement!(ඞBODY: ty = $ty, collection = $collection, len = $len)
         };
     };
     ($vis:vis static $name:ident: &[$ty:ty] = $collection:expr) => {
-        $vis static $name: &'static [$ty; cement!(ඞLEN: $collection)] = &{
-            cement!(ඞBODY: $ty, $collection, cement!(ඞLEN: $collection))
+        $vis static $name: &'static [$ty; cement!(ඞLEN: collection = $collection)] = &{
+            cement!(ඞBODY: ty = $ty, collection = $collection, len = cement!(ඞLEN: collection = $collection))
         };
     };
-    (ඞLEN: $collection:expr) => {
+    (ඞLEN: collection = $collection:expr) => {
         {
             let collection = $collection;
             let len = collection.len();
@@ -43,7 +43,7 @@ macro_rules! cement {
             len
         }
     };
-    (ඞBODY: $ty:ty, $collection:expr ,$len:expr) => {
+    (ඞBODY: ty = $ty:ty, collection = $collection:expr, len = $len:expr) => {
         {
             const LEN: usize = $len;
             let mut array_uninit: [::core::mem::MaybeUninit<$ty>; LEN] = [::core::mem::MaybeUninit::uninit(); LEN];
