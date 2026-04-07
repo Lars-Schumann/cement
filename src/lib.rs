@@ -2,6 +2,11 @@
 #![feature(const_heap)]
 #![feature(const_trait_impl)]
 #![feature(maybe_uninit_array_assume_init)]
+#![no_std]
+
+extern crate alloc;
+#[cfg(test)]
+extern crate std;
 
 #[macro_export]
 macro_rules! cement {
@@ -51,6 +56,8 @@ macro_rules! cement {
 
 #[cfg(test)]
 mod tests {
+    use alloc::vec::Vec;
+    use std::dbg;
 
     #[expect(clippy::vec_init_then_push)]
     const fn v_1_2_3() -> Vec<i32> {
