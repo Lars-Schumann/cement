@@ -2,7 +2,7 @@
 #![feature(const_trait_impl)]
 #![feature(maybe_uninit_array_assume_init)]
 
-use cement::cement;
+use auto_array::auto_array;
 
 fn main() {
     #[expect(clippy::vec_init_then_push)]
@@ -14,13 +14,13 @@ fn main() {
         vec
     }
 
-    cement!(pub const ARRAY1: [i32; ?] = one_two_three());
-    cement!(static ARRAY2: [i32; ?] = one_two_three());
+    auto_array!(pub const ARRAY1: [i32; ?] = one_two_three());
+    auto_array!(static ARRAY2: [i32; ?] = one_two_three());
 
-    cement!(pub(in self) const ARRAY3: [i32; 3] = one_two_three());
-    cement!(pub static ARRAY4: [i32; 3] = one_two_three());
+    auto_array!(pub(in self) const ARRAY3: [i32; 3] = one_two_three());
+    auto_array!(pub static ARRAY4: [i32; 3] = one_two_three());
 
-    cement!(static ARRAY5: &[i32] = one_two_three());
+    auto_array!(static ARRAY5: &[i32] = one_two_three());
 
     dbg!(ARRAY1, ARRAY2, ARRAY3, ARRAY4, ARRAY5);
 }

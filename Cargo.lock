@@ -3,5 +3,5 @@
 version = 4
 
 [[package]]
-name = "cement"
+name = "auto_array"
 version = "0.1.0"

@@ -1,38 +1,41 @@
 #![allow(unused_features)]
 #![feature(const_heap)]
+#![feature(const_clone)]
 #![feature(const_trait_impl)]
 #![feature(maybe_uninit_array_assume_init)]
 #![no_std]
+
+use core::mem::MaybeUninit;
 
 extern crate alloc;
 #[cfg(test)]
 extern crate std;
 
 #[macro_export]
-macro_rules! cement {
+macro_rules! auto_array {
     ($vis:vis const $name:ident: [$ty:ty; ?] = $collection:expr) => {
-        $vis const $name: [$ty; cement!(ඞLEN: collection=$collection)] = {
-            cement!(ඞBODY: ty = $ty, collection = $collection, len = cement!(ඞLEN: collection = $collection))
+        $vis const $name: [$ty; auto_array!(ඞLEN: collection=$collection)] = {
+            auto_array!(ඞBODY: ty = $ty, collection = $collection, len = auto_array!(ඞLEN: collection = $collection))
         };
     };
     ($vis:vis static $name:ident: [$ty:ty; ?] = $collection:expr) => {
-        $vis static $name: [$ty; cement!(ඞLEN: collection = $collection)] = {
-            cement!(ඞBODY: ty = $ty, collection = $collection, len = cement!(ඞLEN: collection = $collection))
+        $vis static $name: [$ty; auto_array!(ඞLEN: collection = $collection)] = {
+            auto_array!(ඞBODY: ty = $ty, collection = $collection, len = auto_array!(ඞLEN: collection = $collection))
         };
     };
     ($vis:vis const $name:ident: [$ty:ty; $len:expr] = $collection:expr) => {
         $vis const $name: [$ty; $len] = {
-            cement!(ඞBODY: ty = $ty, collection = $collection, len = $len)
+            auto_array!(ඞBODY: ty = $ty, collection = $collection, len = $len)
         };
     };
     ($vis:vis static $name:ident: [$ty:ty; $len:expr] = $collection:expr) => {
         $vis static $name: [$ty; $len] = {
-            cement!(ඞBODY: ty = $ty, collection = $collection, len = $len)
+            auto_array!(ඞBODY: ty = $ty, collection = $collection, len = $len)
         };
     };
     ($vis:vis static $name:ident: &[$ty:ty] = $collection:expr) => {
-        $vis static $name: &'static [$ty; cement!(ඞLEN: collection = $collection)] = &{
-            cement!(ඞBODY: ty = $ty, collection = $collection, len = cement!(ඞLEN: collection = $collection))
+        $vis static $name: &'static [$ty; auto_array!(ඞLEN: collection = $collection)] = &{
+            auto_array!(ඞBODY: ty = $ty, collection = $collection, len = auto_array!(ඞLEN: collection = $collection))
         };
     };
     (ඞLEN: collection = $collection:expr) => {
@@ -59,8 +62,39 @@ macro_rules! cement {
     };
 }
 
+#[expect(clippy::len_without_is_empty)]
+pub const trait Len {
+    fn len(&self) -> usize;
+}
+
+pub const trait auto_array {
+    fn auto_array<T: [const] Clone, Index, const N: usize>(vec: alloc::vec::Vec<T>) -> [T; N] {
+        panic!()
+    }
+}
+
+const fn auto_array<T: [const] Clone, const N: usize>(vec: alloc::vec::Vec<T>) -> [T; N] {
+    if vec.len() != N {
+        panic!("Vec's len does not match expected N")
+    }
+    let mut array = [const { MaybeUninit::uninit() }; N];
+
+    let slice = vec.as_slice();
+
+    let mut i = 0;
+
+    while i < vec.len() {
+        array[i] = ::core::mem::MaybeUninit::new(slice[i].clone());
+        i += 1;
+    }
+
+    ::core::mem::forget(vec);
+    unsafe { ::core::mem::MaybeUninit::array_assume_init(array) }
+}
+
 #[cfg(test)]
 mod tests {
+    use super::*;
     use alloc::vec::Vec;
     use std::dbg;
 
@@ -76,13 +110,15 @@ mod tests {
     #[expect(clippy::needless_pub_self)]
     #[test]
     fn it_works() {
-        cement!(pub const ARRAY1: [i32; ?] = v_1_2_3());
-        cement!(static ARRAY2: [i32; ?] = v_1_2_3());
+        auto_array!(pub const ARRAY1: [i32; ?] = v_1_2_3());
+        auto_array!(static ARRAY2: [i32; ?] = v_1_2_3());
 
-        cement!(pub(in self) const ARRAY3: [i32; 3] = v_1_2_3());
-        cement!(pub(in super) static ARRAY4: [i32; 3] = v_1_2_3());
+        auto_array!(pub(in self) const ARRAY3: [i32; 3] = v_1_2_3());
+        auto_array!(pub(in super) static ARRAY4: [i32; 3] = v_1_2_3());
 
-        cement!(static ARRAY5: &[i32] = v_1_2_3());
+        auto_array!(static ARRAY5: &[i32] = v_1_2_3());
+
+        const A1: [i32; 3] = auto_array(v_1_2_3());
 
         let _ = ARRAY1;
 
