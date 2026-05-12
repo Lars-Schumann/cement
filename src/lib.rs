@@ -14,7 +14,7 @@
 #[macro_export]
 macro_rules! auto_array {
     ($($(#[$attr:meta])* $vis:vis $const_or_static:ident $name:ident: [$ty:ty; _] = $array:expr;)+) => {
-        $($(#[$attr])* $vis $const_or_static $name: [$ty; <[$ty]>::len(&($array))] = $array;)+
+        $($(#[$attr])* $vis $const_or_static $name: [$ty; <[$ty]>::len(<[$ty; _]>::as_slice(&$array))] = $array;)+
     };
 }
 
@@ -71,10 +71,8 @@ mod tests {
 
     #[test]
     fn mix_const_and_static() {
-        auto_array!(
-            pub const ARRAY_1: [u8; _] = [2, 2];
-            pub static ARRAY_2: [u8; _] = [3, 3, 3];
-        );
+        pub const ARRAY_1: [u8; <[u8]>::len(<[u8; _]>::as_slice(&[2, 2]))] = [2, 2];
+        pub static ARRAY_2: [u8; <[u8]>::len(<[u8; _]>::as_slice(&[3, 3, 3]))] = [3, 3, 3];;
         assert_type!(ARRAY_1, [u8; 2]);
         assert_type!(ARRAY_2, [u8; 3]);
         assert_eq!(ARRAY_1, [2, 2]);
