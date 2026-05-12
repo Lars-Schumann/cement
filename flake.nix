@@ -22,7 +22,7 @@
     {
       devShells.${system}.default = pkgs.mkShell {
         packages = with pkgs; [
-          (rust-bin.selectLatestNightlyWith (toolchain: toolchain.default))
+          rust-bin.stable.latest.default
 
           clippy
           bacon
