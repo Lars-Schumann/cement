@@ -2,12 +2,10 @@
 
 #[macro_export]
 macro_rules! auto_array {
-    ($($vis:vis const $name:ident: [$ty:ty; _] = $array:expr;)+) => {
-        $($vis const $name: [$ty;<[$ty]>::len(&($array))] = $array;)+
+    ($($vis:vis $const_or_static:ident $name:ident: [$ty:ty; _] = $array:expr;)+) => {
+        $($vis $const_or_static $name: [$ty; <[$ty]>::len(&($array))] = $array;)+
     };
-    ($($vis:vis static $name:ident: [$ty:ty; _] = $array:expr;)+) => {
-        $($vis static $name: [$ty; <[$ty]>::len(&($array))] = $array;)+
-    };
+
 }
 
 #[cfg(test)]
