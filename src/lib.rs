@@ -2,10 +2,9 @@
 
 #[macro_export]
 macro_rules! auto_array {
-    ($($vis:vis $const_or_static:ident $name:ident: [$ty:ty; _] = $array:expr;)+) => {
-        $($vis $const_or_static $name: [$ty; <[$ty]>::len(&($array))] = $array;)+
+    ($($(#[$attr:meta])* $vis:vis $const_or_static:ident $name:ident: [$ty:ty; _] = $array:expr;)+) => {
+        $($(#[$attr])* $vis $const_or_static $name: [$ty; <[$ty]>::len(&($array))] = $array;)+
     };
-
 }
 
 #[cfg(test)]
@@ -69,5 +68,14 @@ mod tests {
         assert_type!(ARRAY_2, [u8; 3]);
         assert_eq!(ARRAY_1, [2, 2]);
         assert_eq!(ARRAY_2, [3, 3, 3]);
+    }
+
+    #[test]
+    #[deny(dead_code)]
+    fn attributes() {
+        auto_array!(
+            #[expect(dead_code)]
+            pub const UGLY_ARRAY: [f32; _] = [5.0];
+        );
     }
 }
