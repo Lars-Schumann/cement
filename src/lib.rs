@@ -5,8 +5,6 @@
 #![feature(maybe_uninit_array_assume_init)]
 #![no_std]
 
-use core::mem::MaybeUninit;
-
 extern crate alloc;
 #[cfg(test)]
 extern crate std;
@@ -62,36 +60,6 @@ macro_rules! auto_array {
     };
 }
 
-#[expect(clippy::len_without_is_empty)]
-pub const trait Len {
-    fn len(&self) -> usize;
-}
-
-pub const trait auto_array {
-    fn auto_array<T: [const] Clone, Index, const N: usize>(vec: alloc::vec::Vec<T>) -> [T; N] {
-        panic!()
-    }
-}
-
-const fn auto_array<T: [const] Clone, const N: usize>(vec: alloc::vec::Vec<T>) -> [T; N] {
-    if vec.len() != N {
-        panic!("Vec's len does not match expected N")
-    }
-    let mut array = [const { MaybeUninit::uninit() }; N];
-
-    let slice = vec.as_slice();
-
-    let mut i = 0;
-
-    while i < vec.len() {
-        array[i] = ::core::mem::MaybeUninit::new(slice[i].clone());
-        i += 1;
-    }
-
-    ::core::mem::forget(vec);
-    unsafe { ::core::mem::MaybeUninit::array_assume_init(array) }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -117,8 +85,6 @@ mod tests {
         auto_array!(pub(in super) static ARRAY4: [i32; 3] = v_1_2_3());
 
         auto_array!(static ARRAY5: &[i32] = v_1_2_3());
-
-        const A1: [i32; 3] = auto_array(v_1_2_3());
 
         let _ = ARRAY1;
 
