@@ -82,11 +82,12 @@ mod tests {
     }
 
     #[test]
-    #[deny(dead_code)]
+    #[deny(dead_code, clippy::approx_constant)]
     fn attributes() {
         auto_array!(
             #[expect(dead_code)]
-            pub const UNUSED: [f32; _] = [5.0];
+            #[expect(clippy::approx_constant)]
+            pub const UNUSED: [f32; _] = [3.14];
         );
     }
 }
