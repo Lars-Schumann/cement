@@ -16,15 +16,15 @@ mod tests {
     #[test]
     fn single_arrays() {
         auto_array!(
-            pub const ARRAY_1_IN: [i32; _] = [1, 2, 3];
+            pub const ARRAY_1: [i32; _] = [1, 2, 3];
         );
-        const ARRAY_1_OUT: [i32; 3] = [1, 2, 3];
-        assert_eq!(ARRAY_1_IN, ARRAY_1_OUT);
+        const _: [i32; 3] = ARRAY_1;
+        assert_eq!(ARRAY_1, [1, 2, 3]);
 
         auto_array!(
-            pub(super) static ARRAY_2_IN: [i32; _] = [4, 4, 4, 4];
+            pub(super) static ARRAY_2: [i32; _] = [4, 4, 4, 4];
         );
-        const ARRAY_2_OUT: [i32; 4] = [4, 4, 4, 4];
-        assert_eq!(ARRAY_2_IN, ARRAY_2_OUT)
+        const _: [i32; 4] = ARRAY_2;
+        assert_eq!(ARRAY_2, [4, 4, 4, 4])
     }
 }
