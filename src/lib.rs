@@ -1,97 +1,30 @@
-#![allow(unused_features)]
-#![feature(const_heap)]
-#![feature(const_clone)]
-#![feature(const_trait_impl)]
-#![feature(maybe_uninit_array_assume_init)]
 #![no_std]
-
-extern crate alloc;
-#[cfg(test)]
-extern crate std;
 
 #[macro_export]
 macro_rules! auto_array {
-    ($vis:vis const $name:ident: [$ty:ty; ?] = $collection:expr) => {
-        $vis const $name: [$ty; auto_array!(ඞLEN: collection=$collection)] = {
-            auto_array!(ඞBODY: ty = $ty, collection = $collection, len = auto_array!(ඞLEN: collection = $collection))
-        };
+    ($vis:vis const $name:ident: [$ty:ty; _] = $array:expr;) => {
+        $vis const $name: [$ty;<[$ty]>::len(&($array))] = $array;
     };
-    ($vis:vis static $name:ident: [$ty:ty; ?] = $collection:expr) => {
-        $vis static $name: [$ty; auto_array!(ඞLEN: collection = $collection)] = {
-            auto_array!(ඞBODY: ty = $ty, collection = $collection, len = auto_array!(ඞLEN: collection = $collection))
-        };
-    };
-    ($vis:vis const $name:ident: [$ty:ty; $len:expr] = $collection:expr) => {
-        $vis const $name: [$ty; $len] = {
-            auto_array!(ඞBODY: ty = $ty, collection = $collection, len = $len)
-        };
-    };
-    ($vis:vis static $name:ident: [$ty:ty; $len:expr] = $collection:expr) => {
-        $vis static $name: [$ty; $len] = {
-            auto_array!(ඞBODY: ty = $ty, collection = $collection, len = $len)
-        };
-    };
-    ($vis:vis static $name:ident: &[$ty:ty] = $collection:expr) => {
-        $vis static $name: &'static [$ty; auto_array!(ඞLEN: collection = $collection)] = &{
-            auto_array!(ඞBODY: ty = $ty, collection = $collection, len = auto_array!(ඞLEN: collection = $collection))
-        };
-    };
-    (ඞLEN: collection = $collection:expr) => {
-        {
-            let collection = $collection;
-            let len = collection.len();
-            ::core::mem::forget(collection);
-            len
-        }
-    };
-    (ඞBODY: ty = $ty:ty, collection = $collection:expr, len = $len:expr) => {
-        {
-            const LEN: usize = $len;
-            let mut array_uninit: [::core::mem::MaybeUninit<$ty>; LEN] = [::core::mem::MaybeUninit::uninit(); LEN];
-            let collection = $collection;
-            let mut i: usize = 0;
-            while i < LEN {
-                array_uninit[i] = ::core::mem::MaybeUninit::new(collection.as_slice()[i]);
-                i += 1;
-            }
-            ::core::mem::forget(collection);
-            unsafe { ::core::mem::MaybeUninit::array_assume_init(array_uninit) }
-        }
+    ($vis:vis static $name:ident: [$ty:ty; _] = $array:expr;) => {
+        $vis static $name: [$ty; <[$ty]>::len(&($array))] = $array;
     };
 }
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-    use alloc::vec::Vec;
-    use std::dbg;
 
-    #[expect(clippy::vec_init_then_push)]
-    const fn v_1_2_3() -> Vec<i32> {
-        let mut vec: Vec<i32> = Vec::new();
-        vec.push(1);
-        vec.push(2);
-        vec.push(3);
-        vec
-    }
-
-    #[expect(clippy::needless_pub_self)]
     #[test]
-    fn it_works() {
-        auto_array!(pub const ARRAY1: [i32; ?] = v_1_2_3());
-        auto_array!(static ARRAY2: [i32; ?] = v_1_2_3());
+    fn single_arrays() {
+        auto_array!(
+            pub const ARRAY_1_IN: [i32; _] = [1, 2, 3];
+        );
+        const ARRAY_1_OUT: [i32; 3] = [1, 2, 3];
+        assert_eq!(ARRAY_1_IN, ARRAY_1_OUT);
 
-        auto_array!(pub(in self) const ARRAY3: [i32; 3] = v_1_2_3());
-        auto_array!(pub(in super) static ARRAY4: [i32; 3] = v_1_2_3());
-
-        auto_array!(static ARRAY5: &[i32] = v_1_2_3());
-
-        let _ = ARRAY1;
-
-        dbg!(ARRAY1);
-        dbg!(ARRAY2);
-        dbg!(ARRAY3);
-        dbg!(ARRAY4);
-        dbg!(ARRAY5);
+        auto_array!(
+            pub(super) static ARRAY_2_IN: [i32; _] = [4, 4, 4, 4];
+        );
+        const ARRAY_2_OUT: [i32; 4] = [4, 4, 4, 4];
+        assert_eq!(ARRAY_2_IN, ARRAY_2_OUT)
     }
 }
