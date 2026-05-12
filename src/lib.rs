@@ -86,7 +86,7 @@ mod tests {
     fn attributes() {
         auto_array!(
             #[expect(dead_code)]
-            pub const UGLY_ARRAY: [f32; _] = [5.0];
+            pub const UNUSED: [f32; _] = [5.0];
         );
     }
 }
