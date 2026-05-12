@@ -1,5 +1,5 @@
 {
-  description = "rust dev shell for vsnymit";
+  description = "rust dev shell for auto_array";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
@@ -37,7 +37,7 @@
         };
 
         shellHook = ''
-          export PS1="\[\e[1;33m\][vsnymit]]\[\e[0m\] $PS1"
+          export PS1="\[\e[1;33m\][auto_array]\[\e[0m\] $PS1"
         '';
       };
     };
