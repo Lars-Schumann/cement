@@ -13,18 +13,25 @@ macro_rules! auto_array {
 #[cfg(test)]
 mod tests {
 
+    macro_rules! assert_type {
+        ($path:path, $ty:ty ) => {
+            let _: $ty = $path;
+        };
+    }
+
     #[test]
     fn single_arrays() {
         auto_array!(
             pub const ARRAY_1: [i32; _] = [1, 2, 3];
         );
         const _: [i32; 3] = ARRAY_1;
+        assert_type!(ARRAY_1, [i32; 3]);
         assert_eq!(ARRAY_1, [1, 2, 3]);
 
         auto_array!(
             pub(super) static ARRAY_2: [i32; _] = [4, 4, 4, 4];
         );
-        const _: [i32; 4] = ARRAY_2;
+        assert_type!(ARRAY_2, [i32; 4]);
         assert_eq!(ARRAY_2, [4, 4, 4, 4])
     }
 }
