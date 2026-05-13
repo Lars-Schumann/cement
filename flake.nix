@@ -27,6 +27,8 @@
           clippy
           bacon
 
+          cargo-msrv
+
           nixfmt
           nixd
 
@@ -38,6 +40,8 @@
 
         shellHook = ''
           export PS1="\[\e[1;33m\][auto_array]\[\e[0m\] $PS1"
+
+          alias msrv="cargo msrv find --linear -- cargo test"
         '';
       };
     };
