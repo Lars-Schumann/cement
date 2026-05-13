@@ -20,63 +20,62 @@ macro_rules! auto_array {
 
 #[cfg(test)]
 mod tests {
-
-    macro_rules! assert_type {
-        ($path:path, $ty:ty ) => {
-            let _: $ty = $path;
+    macro_rules! assert_type_and_value {
+        ($($lhs:path: $ty:ty = $rhs:expr;)*) => {
+            $(let _: $ty = $lhs;
+            assert_eq!($lhs, $rhs);)*
         };
     }
 
     #[test]
     fn single_arrays() {
         auto_array!(
-            pub const ARRAY_1: [i32; _] = [1, 2, 3];
+            pub const A: [i32; _] = [1, 2, 3];
         );
-        assert_type!(ARRAY_1, [i32; 3]);
-        assert_eq!(ARRAY_1, [1, 2, 3]);
-
         auto_array!(
-            pub(super) static ARRAY_2: [i8; _] = [4, 4, 4, 4];
+            pub(super) static B: [i8; _] = [4, 4, 4, 4];
         );
-        assert_type!(ARRAY_2, [i8; 4]);
-        assert_eq!(ARRAY_2, [4, 4, 4, 4]);
+        assert_type_and_value!(
+            A: [i32; 3] = [1, 2, 3];
+            B: [i8; 4] = [4, 4, 4, 4];
+        );
     }
 
     #[test]
     fn multiple_arrays() {
         auto_array!(
-            pub const ARRAY_1: [i8; _] = [1, 2, 3];
-            pub const ARRAY_2: [i16; _] = [];
-            pub const ARRAY_3: [i32; _] = [4, 4, 4, 4];
-            pub const ARRAY_4: [i64; _] = [6, 6, 6, 6, 6, 6];
+            const A: [i8; _] = [1, 2, 3];
+            const B: [i16; _] = [];
+            const C: [i32; _] = [4, 4, 4, 4];
+            const D: [i64; _] = [6, 6, 6, 6, 6, 6];
         );
-        assert_type!(ARRAY_1, [i8; 3]);
-        assert_type!(ARRAY_2, [i16; 0]);
-        assert_type!(ARRAY_3, [i32; 4]);
-        assert_type!(ARRAY_4, [i64; 6]);
-        assert_eq!(ARRAY_1, [1, 2, 3]);
-        assert_eq!(ARRAY_2, []);
-        assert_eq!(ARRAY_3, [4, 4, 4, 4]);
-        assert_eq!(ARRAY_4, [6, 6, 6, 6, 6, 6]);
+        assert_type_and_value!(
+            A: [i8; 3] = [1, 2, 3];
+            B: [i16; 0] = [];
+            C: [i32; 4] = [4, 4, 4, 4];
+            D: [i64; 6] = [6, 6, 6, 6, 6, 6];
+        );
 
         auto_array!(
-            pub static ARRAY_5: [u32; _] = [1];
-            pub static ARRAY_6: [u64; _] = [2, 2];
+            static E: [u32; _] = [1];
+            static F: [u64; _] = [2, 2];
         );
-        assert_type!(ARRAY_5, [u32; 1]);
-        assert_type!(ARRAY_6, [u64; 2]);
-        assert_eq!(ARRAY_5, [1]);
-        assert_eq!(ARRAY_6, [2, 2]);
+        assert_type_and_value!(
+            E: [u32; 1] = [1];
+            F: [u64; 2] = [2, 2];
+        );
     }
 
     #[test]
     fn mix_const_and_static() {
-        pub const ARRAY_1: [u8; <[u8]>::len(<[u8; _]>::as_slice(&[2, 2]))] = [2, 2];
-        pub static ARRAY_2: [u8; <[u8]>::len(<[u8; _]>::as_slice(&[3, 3, 3]))] = [3, 3, 3];
-        assert_type!(ARRAY_1, [u8; 2]);
-        assert_type!(ARRAY_2, [u8; 3]);
-        assert_eq!(ARRAY_1, [2, 2]);
-        assert_eq!(ARRAY_2, [3, 3, 3]);
+        auto_array!(
+            const A: [u8; _] = [2, 2];
+            static B: [u8; _] = [3, 3, 3];
+        );
+        assert_type_and_value!(
+            A: [u8; 2] = [2, 2];
+            B: [u8; 3] = [3, 3, 3];
+        );
     }
 
     #[test]
@@ -85,7 +84,7 @@ mod tests {
         auto_array!(
             #[expect(dead_code)]
             #[expect(clippy::approx_constant)]
-            pub const UNUSED: [f32; _] = [3.14];
+            pub(crate) const UNUSED: [f32; _] = [3.14];
         );
     }
 
