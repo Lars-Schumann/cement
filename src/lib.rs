@@ -72,7 +72,7 @@ mod tests {
     #[test]
     fn mix_const_and_static() {
         pub const ARRAY_1: [u8; <[u8]>::len(<[u8; _]>::as_slice(&[2, 2]))] = [2, 2];
-        pub static ARRAY_2: [u8; <[u8]>::len(<[u8; _]>::as_slice(&[3, 3, 3]))] = [3, 3, 3];;
+        pub static ARRAY_2: [u8; <[u8]>::len(<[u8; _]>::as_slice(&[3, 3, 3]))] = [3, 3, 3];
         assert_type!(ARRAY_1, [u8; 2]);
         assert_type!(ARRAY_2, [u8; 3]);
         assert_eq!(ARRAY_1, [2, 2]);
