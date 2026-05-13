@@ -7,6 +7,7 @@ license = "MIT OR Apache-2.0"
 repository = "https://github.com/lars-schumann/auto_array"
 # homepage = ""
 readme = "README.md"
+description = "A macro to automatically calculate the length of arrays"
 
 
 [dependencies]
