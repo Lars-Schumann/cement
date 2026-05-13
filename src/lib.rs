@@ -2,6 +2,7 @@
 
 /// # Examples
 /// ```rust
+/// use auto_array::auto_array;
 /// auto_array! {
 ///     // Additional attributes, docs, and visibility are supported.
 ///     /// A const array.
