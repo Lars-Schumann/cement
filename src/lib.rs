@@ -13,8 +13,8 @@
 /// ```
 #[macro_export]
 macro_rules! auto_array {
-    ($($(#[$attr:meta])* $vis:vis $const_or_static:ident $name:ident: [$ty:ty; _] = $array:expr;)+) => {
-        $($(#[$attr])* $vis $const_or_static $name: [$ty; <[$ty]>::len(<[$ty; _]>::as_slice(&$array))] = $array;)+
+    ($($(#[$attr:meta])* $vis:vis $const_or_static:ident $name:ident: [$ty:ty; _] = $array:expr;)*) => {
+        $($(#[$attr])* $vis $const_or_static $name: [$ty; <[$ty]>::len(<[$ty; _]>::as_slice(&$array))] = $array;)*
     };
 }
 
@@ -87,5 +87,10 @@ mod tests {
             #[expect(clippy::approx_constant)]
             pub const UNUSED: [f32; _] = [3.14];
         );
+    }
+
+    #[test]
+    fn empty_invocation() {
+        auto_array!();
     }
 }
