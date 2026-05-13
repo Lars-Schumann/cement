@@ -9,6 +9,7 @@ repository = "https://github.com/lars-schumann/auto_array"
 # homepage = ""
 readme = "README.md"
 description = "A macro to automatically calculate the length of arrays"
+keywords = ["auto", "array", "const", "macro"]
 
 
 [dependencies]
